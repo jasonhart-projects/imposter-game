@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0f0f1a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Imposter Game</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div id="app">
+
+  <!-- ── HOME ── -->
+  <div id="screen-home" class="screen active">
+    <div class="home-logo-wrap">
+      <span class="home-logo-icon">🕵️</span>
+      <div class="logo">IMPOSTER</div>
+      <div class="subtitle">Who's hiding among you?</div>
+    </div>
+    <div class="home-actions">
+      <button class="btn btn-primary" id="btn-create" style="font-size:1.1rem;padding:18px">
+        🎮 Create Game
+      </button>
+      <button class="btn btn-secondary" id="btn-join-nav">
+        🔗 Join Game
+      </button>
+    </div>
+  </div>
+
+  <!-- ── CREATE GAME ── -->
+  <div id="screen-create" class="screen">
+    <div class="screen-header">
+      <button class="btn btn-ghost btn-sm" id="btn-back-create" style="width:auto">← Back</button>
+      <h2>New Game</h2>
+    </div>
+    <div class="screen-body">
+      <div class="input-group">
+        <label class="input-label">Your Name</label>
+        <input type="text" id="create-name" placeholder="Enter your name" maxlength="20" autocomplete="off" autocorrect="off" spellcheck="false">
+      </div>
+
+      <div class="section-label">Game Settings</div>
+      <div class="card" style="display:flex;flex-direction:column;gap:16px">
+        <div class="settings-grid">
+          <div class="input-group">
+            <label class="input-label">Rounds</label>
+            <select id="setting-rounds">
+              <option value="3">3 Rounds</option>
+              <option value="5" selected>5 Rounds</option>
+              <option value="7">7 Rounds</option>
+              <option value="10">10 Rounds</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label class="input-label">Imposters</label>
+            <select id="setting-imposters">
+              <option value="1" selected>1 Imposter</option>
+              <option value="2">2 Imposters</option>
+            </select>
+          </div>
+        </div>
+        <div class="toggle-row">
+          <span class="toggle-label">Turn Timer (30s)</span>
+          <label class="toggle">
+            <input type="checkbox" id="setting-timer" checked>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="toggle-row">
+          <span class="toggle-label">Allow Passing Turn</span>
+          <label class="toggle">
+            <input type="checkbox" id="setting-pass" checked>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" id="btn-create-room" style="margin-top:8px">Create Room</button>
+    </div>
+  </div>
+
+  <!-- ── JOIN GAME ── -->
+  <div id="screen-join" class="screen">
+    <div class="screen-header">
+      <button class="btn btn-ghost btn-sm" id="btn-back-join" style="width:auto">← Back</button>
+      <h2>Join Game</h2>
+    </div>
+    <div class="screen-body" style="justify-content:center">
+      <div class="card join-card" style="display:flex;flex-direction:column;gap:16px">
+        <div class="input-group">
+          <label class="input-label">Room Code</label>
+          <input type="text" id="join-code" class="room-code-input" placeholder="XXXX" maxlength="4" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false">
+        </div>
+        <div class="input-group">
+          <label class="input-label">Your Name</label>
+          <input type="text" id="join-name" placeholder="Enter your name" maxlength="20" autocomplete="off" autocorrect="off" spellcheck="false">
+        </div>
+        <button class="btn btn-primary" id="btn-join-room">Join Room</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── LOBBY ── -->
+  <div id="screen-lobby" class="screen">
+    <div class="screen-header">
+      <h2>Lobby</h2>
+      <div id="lobby-round-info" style="font-size:0.8rem;color:var(--text-muted)"></div>
+    </div>
+    <div class="screen-body">
+      <div class="lobby-code">
+        <div class="lobby-hint">Share this code with friends</div>
+        <div class="room-code-display" id="lobby-code">----</div>
+        <div class="lobby-hint">👆 Tap to copy</div>
+      </div>
+
+      <div class="section-label" id="player-count-label">Players (0/10)</div>
+      <div class="player-list" id="player-list"></div>
+
+      <div id="lobby-host-controls" style="display:none;flex-direction:column;gap:10px">
+        <div class="divider"></div>
+        <div class="section-label">Game Settings</div>
+        <div class="card" style="display:flex;flex-direction:column;gap:12px;font-size:0.9rem">
+          <div style="display:flex;justify-content:space-between"><span style="color:var(--text-muted)">Rounds</span><span id="lobby-rounds" style="font-weight:700"></span></div>
+          <div style="display:flex;justify-content:space-between"><span style="color:var(--text-muted)">Imposters</span><span id="lobby-imposters" style="font-weight:700"></span></div>
+          <div style="display:flex;justify-content:space-between"><span style="color:var(--text-muted)">Turn Timer</span><span id="lobby-timer" style="font-weight:700"></span></div>
+        </div>
+        <button class="btn btn-primary" id="btn-start-game">Start Game</button>
+      </div>
+      <div id="lobby-waiting-msg" style="text-align:center;color:var(--text-muted);font-size:0.9rem">
+        Waiting for host to start<span class="waiting-dots">...</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── ROLE REVEAL ── -->
+  <div id="screen-reveal" class="screen centered">
+    <div class="reveal-instruction">
+      <strong id="reveal-round-label">Round 1</strong> · Tap the card to see your role
+    </div>
+    <div class="reveal-card" id="reveal-card">
+      <div class="reveal-card-inner">
+        <div class="reveal-face reveal-front">
+          <span style="font-size:3.5rem">🃏</span>
+          <div style="font-weight:700;font-size:1.1rem">Tap to reveal</div>
+          <div style="font-size:0.8rem;color:var(--text-muted)">Keep it private!</div>
+        </div>
+        <div class="reveal-face reveal-back" id="reveal-back">
+          <div class="reveal-role" id="reveal-role-label"></div>
+          <div class="reveal-icon" id="reveal-icon"></div>
+          <div class="reveal-word" id="reveal-word"></div>
+          <div class="reveal-category" id="reveal-category"></div>
+        </div>
+      </div>
+    </div>
+    <div class="reveal-confirmed" id="reveal-confirmed">
+      ✅ Confirmed — waiting for others
+    </div>
+    <div class="waiting-players" id="reveal-waiting">
+      <span id="reveal-wait-count"></span>
+    </div>
+  </div>
+
+  <!-- ── PLAYING ── -->
+  <div id="screen-playing" class="screen" style="min-height:100dvh;position:relative">
+    <div class="game-header">
+      <div>
+        <div class="game-round" id="play-round-label">Round 1 of 5</div>
+        <div class="game-phase" id="play-phase-label">Discussion</div>
+      </div>
+      <div class="timer-ring" id="timer-ring" style="display:none">
+        <svg width="56" height="56" viewBox="0 0 56 56">
+          <circle class="bg" cx="28" cy="28" r="22" stroke-width="4"/>
+          <circle class="progress" id="timer-progress" cx="28" cy="28" r="22"
+            stroke-width="4"
+            stroke-dasharray="138.2"
+            stroke-dashoffset="0"/>
+        </svg>
+        <div class="timer-text" id="timer-text">30</div>
+      </div>
+    </div>
+
+    <div class="screen-body" style="padding-bottom:160px">
+      <!-- Mini scoreboard -->
+      <div class="mini-scores" id="mini-scores"></div>
+
+      <!-- Turn banner -->
+      <div class="turn-banner" id="turn-banner">
+        <div class="turn-icon" id="turn-icon">👤</div>
+        <div>
+          <div class="turn-name" id="turn-name">Waiting...</div>
+          <div class="turn-sub" id="turn-sub">Give a one-word clue</div>
+        </div>
+        <div id="speaking-anim" style="display:none">
+          <div class="speaking-indicator"><span></span><span></span><span></span></div>
+        </div>
+      </div>
+
+      <!-- My word reminder (tap to peek) -->
+      <div id="my-word-peek" class="card" style="text-align:center;cursor:pointer;user-select:none">
+        <div style="font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Your Word (tap to peek)</div>
+        <div id="my-word-hidden" style="font-size:2rem;letter-spacing:4px">• • • •</div>
+        <div id="my-word-shown" style="font-size:1.6rem;font-weight:900;display:none"></div>
+        <div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px" id="my-role-badge"></div>
+      </div>
+
+      <!-- Clue log -->
+      <div class="section-label">Clues Given</div>
+      <div class="clue-scroll" id="clue-scroll">
+        <div id="no-clues-yet" style="text-align:center;color:var(--text-muted);font-size:0.85rem;padding:12px">No clues yet...</div>
+      </div>
+    </div>
+
+    <!-- Voice input zone (sticky bottom) -->
+    <div class="voice-zone" id="voice-zone">
+      <div class="voice-transcript" id="voice-transcript-box">
+        <div class="voice-transcript-text"
+             id="voice-transcript"
+             contenteditable="true"
+             data-placeholder="Your clue..."></div>
+      </div>
+      <div class="voice-actions">
+        <button class="mic-btn disabled-mic" id="mic-btn" title="Hold to speak">🎤</button>
+        <button class="btn btn-primary submit-clue-btn" id="btn-submit-clue" disabled>Submit Clue</button>
+        <button class="btn btn-ghost btn-sm" id="btn-pass-clue" style="width:auto;padding:0 14px" title="Pass turn">↷</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── VOTING ── -->
+  <div id="screen-voting" class="screen">
+    <div class="screen-header">
+      <div>
+        <h2>Vote</h2>
+        <div style="font-size:0.85rem;color:var(--text-muted)">Who is the imposter?</div>
+      </div>
+    </div>
+    <div class="screen-body">
+      <!-- Clue recap -->
+      <div class="section-label">Clue Recap</div>
+      <div class="clue-scroll" id="vote-clue-recap"></div>
+
+      <div class="section-label">Cast Your Vote</div>
+      <div id="vote-you-voted" class="card" style="text-align:center;display:none">
+        <div style="font-size:1.5rem">🗳️</div>
+        <div style="font-weight:700;margin-top:8px">Vote cast!</div>
+        <div style="color:var(--text-muted);font-size:0.85rem;margin-top:4px">Waiting for others...</div>
+      </div>
+      <div class="vote-grid" id="vote-grid"></div>
+      <div class="vote-status" id="vote-status"></div>
+    </div>
+  </div>
+
+  <!-- ── RESULTS ── -->
+  <div id="screen-results" class="screen">
+    <div class="screen-header">
+      <h2 id="results-round-label">Round Results</h2>
+    </div>
+    <div class="screen-body">
+      <div class="results-hero" id="results-hero">
+        <span class="results-icon" id="results-icon">🎉</span>
+        <div class="results-title" id="results-title"></div>
+        <div class="results-desc" id="results-desc"></div>
+      </div>
+
+      <div class="word-reveal">
+        <div class="word-reveal-item">
+          <small>Real Word</small>
+          <strong id="result-normal-word"></strong>
+        </div>
+        <div style="width:1px;background:var(--border)"></div>
+        <div class="word-reveal-item imposter-word">
+          <small>Imposter's Word</small>
+          <strong id="result-imposter-word"></strong>
+        </div>
+      </div>
+
+      <div class="section-label">Imposters</div>
+      <div id="results-imposters" style="display:flex;flex-direction:column;gap:8px"></div>
+
+      <div class="section-label">Scoreboard</div>
+      <div class="scoreboard" id="scoreboard"></div>
+
+      <div id="results-host-actions" style="display:none;margin-top:8px">
+        <div class="flex-row">
+          <button class="btn btn-primary" id="btn-next-round">Next Round ▶</button>
+          <button class="btn btn-ghost" id="btn-end-game">End Game</button>
+        </div>
+      </div>
+      <div id="results-wait-msg" style="text-align:center;color:var(--text-muted);font-size:0.85rem">
+        Waiting for host<span class="waiting-dots">...</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── GAME OVER ── -->
+  <div id="screen-game-over" class="screen centered">
+    <div class="screen-body" style="align-items:center">
+      <div style="font-size:4rem;text-align:center">🏆</div>
+      <h2 style="text-align:center">Game Over!</h2>
+      <div style="color:var(--text-muted);font-size:0.9rem;text-align:center">Final scores</div>
+      <div class="scoreboard game-over-scores" id="final-scoreboard" style="width:100%;max-width:360px"></div>
+      <div id="gameover-host-actions" style="display:none;width:100%;max-width:360px;margin-top:8px">
+        <button class="btn btn-primary" id="btn-play-again">Play Again</button>
+        <button class="btn btn-ghost" style="margin-top:8px" id="btn-back-home">Back to Home</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- #app -->
+
+<div id="toast-container"></div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/app.js"></script>
+</body>
+</html>
