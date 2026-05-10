@@ -35,7 +35,7 @@
       <button class="btn btn-ghost btn-sm" id="btn-back-create" style="width:auto">← Back</button>
       <h2>New Game</h2>
     </div>
-    <div class="screen-body">
+    <div class="screen-body" style="overflow-y:auto">
       <div class="input-group">
         <label class="input-label">Your Name</label>
         <input type="text" id="create-name" placeholder="Enter your name" maxlength="20" autocomplete="off" autocorrect="off" spellcheck="false">
@@ -87,7 +87,7 @@
       <button class="btn btn-ghost btn-sm" id="btn-back-join" style="width:auto">← Back</button>
       <h2>Join Game</h2>
     </div>
-    <div class="screen-body" style="justify-content:center">
+    <div class="screen-body" style="justify-content:center;overflow-y:auto">
       <div class="card join-card" style="display:flex;flex-direction:column;gap:16px">
         <div class="input-group">
           <label class="input-label">Room Code</label>
@@ -154,6 +154,9 @@
         </div>
       </div>
     </div>
+    <button class="btn btn-primary" id="btn-confirm-reveal" disabled style="max-width:300px;margin-top:24px">
+      Confirm — I've Seen It
+    </button>
     <div class="reveal-confirmed" id="reveal-confirmed">
       ✅ Confirmed — waiting for others
     </div>
@@ -163,14 +166,14 @@
   </div>
 
   <!-- ── PLAYING ── -->
-  <div id="screen-playing" class="screen" style="min-height:100dvh;position:relative">
+  <div id="screen-playing" class="screen">
     <div class="game-header">
       <div>
         <div class="game-round" id="play-round-label">Round 1 of 5</div>
         <div class="game-phase" id="play-phase-label">Discussion</div>
       </div>
       <div class="timer-ring" id="timer-ring" style="display:none">
-        <svg width="56" height="56" viewBox="0 0 56 56">
+        <svg width="48" height="48" viewBox="0 0 56 56">
           <circle class="bg" cx="28" cy="28" r="22" stroke-width="4"/>
           <circle class="progress" id="timer-progress" cx="28" cy="28" r="22"
             stroke-width="4"
@@ -181,14 +184,12 @@
       </div>
     </div>
 
-    <div class="screen-body" style="padding-bottom:160px">
-      <!-- Mini scoreboard -->
+    <div class="screen-body">
       <div class="mini-scores" id="mini-scores"></div>
 
-      <!-- Turn banner -->
       <div class="turn-banner" id="turn-banner">
         <div class="turn-icon" id="turn-icon">👤</div>
-        <div>
+        <div style="flex:1;min-width:0">
           <div class="turn-name" id="turn-name">Waiting...</div>
           <div class="turn-sub" id="turn-sub">Give a one-word clue</div>
         </div>
@@ -197,18 +198,16 @@
         </div>
       </div>
 
-      <!-- My word reminder (tap to peek) -->
-      <div id="my-word-peek" class="card" style="text-align:center;cursor:pointer;user-select:none">
-        <div style="font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Your Word (tap to peek)</div>
-        <div id="my-word-hidden" style="font-size:2rem;letter-spacing:4px">• • • •</div>
-        <div id="my-word-shown" style="font-size:1.6rem;font-weight:900;display:none"></div>
-        <div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px" id="my-role-badge"></div>
+      <div id="my-word-peek" class="card" style="text-align:center;cursor:pointer;user-select:none;padding:8px 12px">
+        <div style="font-size:0.65rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px">Your Word (tap to peek)</div>
+        <div id="my-word-hidden" style="font-size:1.4rem;letter-spacing:4px">• • • •</div>
+        <div id="my-word-shown" style="font-size:1.3rem;font-weight:900;display:none"></div>
+        <div style="font-size:0.7rem;color:var(--text-muted)" id="my-role-badge"></div>
       </div>
 
-      <!-- Clue log -->
       <div class="section-label">Clues Given</div>
       <div class="clue-scroll" id="clue-scroll">
-        <div id="no-clues-yet" style="text-align:center;color:var(--text-muted);font-size:0.85rem;padding:12px">No clues yet...</div>
+        <div id="no-clues-yet" style="text-align:center;color:var(--text-muted);font-size:0.8rem;padding:8px">No clues yet...</div>
       </div>
     </div>
 
@@ -237,15 +236,14 @@
       </div>
     </div>
     <div class="screen-body">
-      <!-- Clue recap -->
       <div class="section-label">Clue Recap</div>
-      <div class="clue-scroll" id="vote-clue-recap"></div>
+      <div class="clue-scroll capped-scroll" id="vote-clue-recap" style="max-height:25vh;flex:0 1 auto"></div>
 
       <div class="section-label">Cast Your Vote</div>
-      <div id="vote-you-voted" class="card" style="text-align:center;display:none">
+      <div id="vote-you-voted" class="card" style="text-align:center;display:none;padding:12px">
         <div style="font-size:1.5rem">🗳️</div>
-        <div style="font-weight:700;margin-top:8px">Vote cast!</div>
-        <div style="color:var(--text-muted);font-size:0.85rem;margin-top:4px">Waiting for others...</div>
+        <div style="font-weight:700;margin-top:4px">Vote cast!</div>
+        <div style="color:var(--text-muted);font-size:0.8rem">Waiting for others...</div>
       </div>
       <div class="vote-grid" id="vote-grid"></div>
       <div class="vote-status" id="vote-status"></div>
@@ -266,44 +264,41 @@
 
       <div class="word-reveal">
         <div class="word-reveal-item">
-          <small>Real Word</small>
+          <small>Secret Word</small>
           <strong id="result-normal-word"></strong>
         </div>
         <div style="width:1px;background:var(--border)"></div>
         <div class="word-reveal-item imposter-word">
-          <small>Imposter's Word</small>
+          <small>Imposter</small>
           <strong id="result-imposter-word"></strong>
         </div>
       </div>
 
-      <div class="section-label">Imposters</div>
-      <div id="results-imposters" style="display:flex;flex-direction:column;gap:8px"></div>
-
       <div class="section-label">Scoreboard</div>
       <div class="scoreboard" id="scoreboard"></div>
 
-      <div id="results-host-actions" style="display:none;margin-top:8px">
+      <div id="results-host-actions" style="display:none">
         <div class="flex-row">
           <button class="btn btn-primary" id="btn-next-round">Next Round ▶</button>
-          <button class="btn btn-ghost" id="btn-end-game">End Game</button>
+          <button class="btn btn-ghost" id="btn-end-game">End</button>
         </div>
       </div>
-      <div id="results-wait-msg" style="text-align:center;color:var(--text-muted);font-size:0.85rem">
+      <div id="results-wait-msg" style="text-align:center;color:var(--text-muted);font-size:0.8rem">
         Waiting for host<span class="waiting-dots">...</span>
       </div>
     </div>
   </div>
 
   <!-- ── GAME OVER ── -->
-  <div id="screen-game-over" class="screen centered">
+  <div id="screen-game-over" class="screen">
     <div class="screen-body" style="align-items:center">
-      <div style="font-size:4rem;text-align:center">🏆</div>
-      <h2 style="text-align:center">Game Over!</h2>
-      <div style="color:var(--text-muted);font-size:0.9rem;text-align:center">Final scores</div>
-      <div class="scoreboard game-over-scores" id="final-scoreboard" style="width:100%;max-width:360px"></div>
-      <div id="gameover-host-actions" style="display:none;width:100%;max-width:360px;margin-top:8px">
+      <div style="font-size:2.6rem;text-align:center;flex-shrink:0">🏆</div>
+      <h2 style="text-align:center;flex-shrink:0">Game Over!</h2>
+      <div style="color:var(--text-muted);font-size:0.85rem;text-align:center;flex-shrink:0">Final scores</div>
+      <div class="scoreboard" id="final-scoreboard" style="width:100%;max-width:360px"></div>
+      <div id="gameover-host-actions" style="display:none;width:100%;max-width:360px;flex-shrink:0">
         <button class="btn btn-primary" id="btn-play-again">Play Again</button>
-        <button class="btn btn-ghost" style="margin-top:8px" id="btn-back-home">Back to Home</button>
+        <button class="btn btn-ghost" style="margin-top:6px" id="btn-back-home">Back to Home</button>
       </div>
     </div>
   </div>

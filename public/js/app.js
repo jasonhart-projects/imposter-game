@@ -175,6 +175,10 @@ function renderRoleReveal() {
 
   document.getElementById('reveal-confirmed').classList.remove('show');
   document.getElementById('reveal-waiting').textContent = '';
+
+  const confirmBtn = document.getElementById('btn-confirm-reveal');
+  confirmBtn.disabled = true;
+  confirmBtn.style.display = '';
 }
 
 function updateRevealWaiting(room) {
@@ -483,26 +487,8 @@ function renderResults(room) {
   }
 
   document.getElementById('result-normal-word').textContent = r.normalWord;
-  document.getElementById('result-imposter-word').textContent = '(no word)';
-
-  // Imposters reveal
-  const imposterEl = document.getElementById('results-imposters');
-  imposterEl.innerHTML = '';
-  r.imposters.forEach(imp => {
-    const item = document.createElement('div');
-    item.className = 'player-item';
-    const av = makeAvatar(imp.name, 36);
-    const nameEl = document.createElement('div');
-    nameEl.className = 'player-name';
-    nameEl.textContent = imp.name;
-    const badge = document.createElement('span');
-    badge.className = 'badge badge-red';
-    badge.textContent = '🕵️ Imposter';
-    item.appendChild(av);
-    item.appendChild(nameEl);
-    item.appendChild(badge);
-    imposterEl.appendChild(item);
-  });
+  const imposterNames = r.imposters.map(i => i.name).join(', ');
+  document.getElementById('result-imposter-word').textContent = imposterNames || '(unknown)';
 
   // Scoreboard
   const sorted = [...room.players].sort((a, b) => b.score - a.score);
@@ -782,17 +768,29 @@ function bindEvents() {
     state.socket.emit('game:start');
   };
 
-  // Role reveal: tap 1 = flip card, tap 2 = confirm
+  // Role reveal: tap card to flip, separate button to confirm
   document.getElementById('reveal-card').addEventListener('click', () => {
     const card = document.getElementById('reveal-card');
     const confirmed = document.getElementById('reveal-confirmed');
-    if (confirmed.classList.contains('show')) return; // already confirmed
-    if (!card.classList.contains('flipped')) {
-      card.classList.add('flipped');
-    } else {
-      confirmed.classList.add('show');
-      state.socket.emit('player:revealed');
+    if (confirmed.classList.contains('show')) return; // already confirmed, lock card
+    card.classList.toggle('flipped');
+    // Enable the confirm button only after first reveal
+    if (card.classList.contains('flipped')) {
+      document.getElementById('btn-confirm-reveal').disabled = false;
     }
+  });
+
+  document.getElementById('btn-confirm-reveal').addEventListener('click', () => {
+    const card = document.getElementById('reveal-card');
+    if (!card.classList.contains('flipped')) return; // require reveal first
+    const btn = document.getElementById('btn-confirm-reveal');
+    if (btn.disabled) return;
+    btn.disabled = true;
+    btn.style.display = 'none';
+    document.getElementById('reveal-confirmed').classList.add('show');
+    // Auto-flip card back to hide for privacy
+    card.classList.remove('flipped');
+    state.socket.emit('player:revealed');
   });
 
   // My word peek
